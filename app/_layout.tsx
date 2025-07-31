@@ -1,13 +1,34 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import { Stack } from 'expo-router'
+import { Stack } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { getItem } from '@/utils/asynce_storage';
+import { ActivityIndicator, View } from 'react-native';
 
-const _layout = () => {
+const Layout = () => {
+  const [showOnboarding, setShowOnboarding] = useState(null);
+
+  useEffect(() => {
+    checkIfAlreadyOnboarded();
+  }, []);
+
+  const checkIfAlreadyOnboarded = async () => {
+    const onboarded = await getItem('onboarded');
+    setShowOnboarding(onboarded !== '1');
+  };
+
+  if (showOnboarding === null) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
-    <Stack screenOptions={{headerShown:false}}>
-        <Stack.Screen name='index'/>
+    <Stack screenOptions={{ headerShown: false }} initialRouteName={showOnboarding ? 'onBoarding' : 'homeScreen'}>
+      <Stack.Screen name="homeScreen" />
+      <Stack.Screen name="onBoarding" />
     </Stack>
-  )
-}
+  );
+};
 
-export default _layout
+export default Layout;
